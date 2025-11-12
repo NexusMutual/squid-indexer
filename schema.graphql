@@ -1,0 +1,25 @@
+type ProductType @entity {
+  id: ID!
+  name: String!
+  claimMethod: BigInt!
+  gracePeriod: BigInt!
+  assessmentCooldownPeriod: BigInt!
+  payoutRedemptionPeriod: BigInt!
+  metadata: String!
+}
+
+type Product @entity {
+  id: ID!
+  productType: BigInt!
+  name: String!
+  minPrice: BigInt!
+  coverAssets: BigInt!
+  initialPriceRatio: BigInt!
+  capacityReductionRatio: BigInt!
+  isDeprecated: Boolean!
+  useFixedPrice: Boolean!
+  metadata: String!
+  # todo: allowedPools: BigInt[]!
+}
+
+// TODO: add params entity
