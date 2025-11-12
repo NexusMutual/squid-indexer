@@ -1,0 +1,7 @@
+/.env
+/.idea
+/.vscode
+/**Versions.json
+/builds
+/lib
+/node_modules

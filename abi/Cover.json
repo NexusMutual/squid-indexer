@@ -1,0 +1,1452 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_registry",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_stakingPoolImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_verifyingAddress",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "AlreadyMigratedCoverData",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CommissionRateTooHigh",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CoverAmountIsZero",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CoverAssetMismatch",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CoverAssetNotSupported",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "CoverNotYetExpired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CoverPeriodTooLong",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "CoverPeriodTooShort",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ETHTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "EditNotSupported",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ExpiredCoversCannotBeEdited",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientCoverAmountAllocated",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientEthSent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidPaymentAsset",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidRiConfig",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidSignature",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "IpfsMetadataAlreadySet",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "originalCoverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "MustBeOriginalCoverId",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyAdvisoryBoard",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyMember",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyOwnerOrApproved",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "currentState",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "checks",
+        "type": "uint256"
+      }
+    ],
+    "name": "Paused",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "PriceExceedsMaxPremiumInAsset",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ProductDeprecated",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ProductNotFound",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ReentrantCall",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "RevertedWithoutReason",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "RiAmountIsZero",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "callerIndex",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "authorizedBitmap",
+        "type": "uint256"
+      }
+    ],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnexpectedEthSent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "UnexpectedRiPremium",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WrongCoverEditEntrypoint",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "originalCoverId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "buyerMemberId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "productId",
+        "type": "uint256"
+      }
+    ],
+    "name": "CoverBought",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "DEFAULT_MIN_PRICE_RATIO",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "DOMAIN_SEPARATOR",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_COMMISSION_RATIO",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "NXM_PER_ALLOCATION_UNIT",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "activeCover",
+    "outputs": [
+      {
+        "internalType": "uint192",
+        "name": "totalActiveCoverInAsset",
+        "type": "uint192"
+      },
+      {
+        "internalType": "uint64",
+        "name": "lastBucketUpdateId",
+        "type": "uint64"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "payoutAmountInAsset",
+        "type": "uint256"
+      }
+    ],
+    "name": "burnStake",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "coverId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPremiumInAsset",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "paymentAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint16",
+            "name": "commissionRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "address",
+            "name": "commissionDestination",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsData",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct BuyCoverParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "poolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "coverAmountInAsset",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PoolAllocationRequest[]",
+        "name": "poolAllocationRequests",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "buyCover",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "coverId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPremiumInAsset",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "paymentAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint16",
+            "name": "commissionRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "address",
+            "name": "commissionDestination",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsData",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct BuyCoverParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "poolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "coverAmountInAsset",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PoolAllocationRequest[]",
+        "name": "poolAllocationRequests",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "providerId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "premium",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "signature",
+            "type": "bytes"
+          }
+        ],
+        "internalType": "struct RiRequest",
+        "name": "riRequest",
+        "type": "tuple"
+      }
+    ],
+    "name": "buyCoverWithRi",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_coverNFTDescriptor",
+        "type": "address"
+      }
+    ],
+    "name": "changeCoverNFTDescriptor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_stakingNFTDescriptor",
+        "type": "address"
+      }
+    ],
+    "name": "changeStakingNFTDescriptor",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claims",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "coverNFT",
+    "outputs": [
+      {
+        "internalType": "contract ICoverNFT",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "coverProducts",
+    "outputs": [
+      {
+        "internalType": "contract ICoverProducts",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "coverId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxPremiumInAsset",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint8",
+            "name": "paymentAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint16",
+            "name": "commissionRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "address",
+            "name": "commissionDestination",
+            "type": "address"
+          },
+          {
+            "internalType": "string",
+            "name": "ipfsData",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct BuyCoverParams",
+        "name": "params",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "poolId",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "coverAmountInAsset",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct PoolAllocationRequest[]",
+        "name": "poolAllocationRequests",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "buyer",
+        "type": "address"
+      }
+    ],
+    "name": "executeCoverBuy",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "expireCover",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "start",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "gracePeriod",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "rewardsRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "capacityRatio",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct CoverData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getCoverDataCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverDataWithReference",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "start",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "gracePeriod",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "rewardsRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "capacityRatio",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct CoverData",
+        "name": "",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "originalCoverId",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "latestCoverId",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct CoverReference",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverDataWithRi",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "start",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "gracePeriod",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "rewardsRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "capacityRatio",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct CoverData",
+        "name": "",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "providerId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          }
+        ],
+        "internalType": "struct Ri",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverMetadata",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverReference",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint32",
+            "name": "originalCoverId",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "latestCoverId",
+            "type": "uint32"
+          }
+        ],
+        "internalType": "struct CoverReference",
+        "name": "coverReference",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getCoverRi",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "providerId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          }
+        ],
+        "internalType": "struct Ri",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getDefaultMinPriceRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getGlobalCapacityAndPriceRatios",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "_globalCapacityRatio",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_defaultMinPriceRatio",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getGlobalCapacityRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getGlobalRewardsRatio",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLatestEditCoverData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint24",
+            "name": "productId",
+            "type": "uint24"
+          },
+          {
+            "internalType": "uint8",
+            "name": "coverAsset",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint96",
+            "name": "amount",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint32",
+            "name": "start",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "period",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "gracePeriod",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint16",
+            "name": "rewardsRatio",
+            "type": "uint16"
+          },
+          {
+            "internalType": "uint16",
+            "name": "capacityRatio",
+            "type": "uint16"
+          }
+        ],
+        "internalType": "struct CoverData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getPoolAllocations",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint40",
+            "name": "poolId",
+            "type": "uint40"
+          },
+          {
+            "internalType": "uint96",
+            "name": "coverAmountInNXM",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint96",
+            "name": "premiumInNXM",
+            "type": "uint96"
+          },
+          {
+            "internalType": "uint24",
+            "name": "allocationId",
+            "type": "uint24"
+          }
+        ],
+        "internalType": "struct PoolAllocation[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "data",
+        "type": "bytes[]"
+      }
+    ],
+    "name": "multicall",
+    "outputs": [
+      {
+        "internalType": "bytes[]",
+        "name": "results",
+        "type": "bytes[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "pool",
+    "outputs": [
+      {
+        "internalType": "contract IPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "coverIds",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "string[]",
+        "name": "ipfsMetadata",
+        "type": "string[]"
+      }
+    ],
+    "name": "populateIpfsMetadata",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverAsset",
+        "type": "uint256"
+      }
+    ],
+    "name": "recalculateActiveCoverInAsset",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "registry",
+    "outputs": [
+      {
+        "internalType": "contract IRegistry",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "riSigner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "providerId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "premiumDestination",
+        "type": "address"
+      }
+    ],
+    "name": "setRiConfig",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_riSigner",
+        "type": "address"
+      }
+    ],
+    "name": "setRiSigner",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakingNFT",
+    "outputs": [
+      {
+        "internalType": "contract IStakingNFT",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "poolId",
+        "type": "uint256"
+      }
+    ],
+    "name": "stakingPool",
+    "outputs": [
+      {
+        "internalType": "contract IStakingPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakingPoolFactory",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "stakingPoolImplementation",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenController",
+    "outputs": [
+      {
+        "internalType": "contract ITokenController",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "assetId",
+        "type": "uint256"
+      }
+    ],
+    "name": "totalActiveCoverInAsset",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "coverAsset",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateTotalActiveCoverAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
