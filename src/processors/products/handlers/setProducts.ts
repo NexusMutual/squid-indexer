@@ -1,5 +1,5 @@
-import * as CoverProductsAbi from '../abi/CoverProducts';
-import { Product } from '../model';
+import * as CoverProductsAbi from '@/abi/CoverProducts';
+import { Product } from '@/model';
 
 const { setProducts } = CoverProductsAbi.functions;
 const MAX_UINT256 = 2n ** 256n - 1n;
@@ -29,8 +29,7 @@ export async function handleSetProducts(
     product.capacityReductionRatio = BigInt(param.product.capacityReductionRatio);
     product.isDeprecated = param.product.isDeprecated;
     product.useFixedPrice = param.product.useFixedPrice;
-
-    // todo: allowed pools
+    product.allowedPools = param.allowedPools.map(pool => Number(pool));
 
     if (param.ipfsMetadata.length > 0) {
       product.metadata = param.ipfsMetadata;

@@ -1,12 +1,9 @@
-import { Product, ProductType } from '../model';
-import * as CoverProductsAbi from '../abi/CoverProducts';
+import * as CoverProductsAbi from '@/abi/CoverProducts';
+import { Product, ProductType } from '@/model';
 
 const { setProductsMetadata, setProductTypesMetadata } = CoverProductsAbi.functions;
 
-export async function handleSetProductsMetadata(
-  input: string,
-  products: Map<string, Partial<Product>>,
-) {
+export async function handleSetProductsMetadata(input: string, products: Map<string, Partial<Product>>) {
   const productIds = setProductsMetadata.decode(input).productIds;
   const ipfsMetadata = setProductsMetadata.decode(input).ipfsMetadata;
 
@@ -16,10 +13,7 @@ export async function handleSetProductsMetadata(
   }
 }
 
-export async function handleSetProductTypesMetadata(
-  input: string,
-  productTypes: Map<string, Partial<ProductType>>,
-) {
+export async function handleSetProductTypesMetadata(input: string, productTypes: Map<string, Partial<ProductType>>) {
   const productTypeIds = setProductTypesMetadata.decode(input).productTypeIds;
   const ipfsMetadata = setProductTypesMetadata.decode(input).ipfsMetadata;
 
@@ -28,4 +22,3 @@ export async function handleSetProductTypesMetadata(
     productTypes.set(productType.id, productType);
   }
 }
-

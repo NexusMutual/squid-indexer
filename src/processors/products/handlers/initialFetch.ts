@@ -2,9 +2,10 @@ import { addresses } from '@nexusmutual/deployments';
 import { DataHandlerContext } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 
-import * as CoverProductsAbi from '../abi/CoverProducts';
-import { Multicall } from '../abi/multicall';
-import { Product, ProductType } from '../model';
+import * as CoverProductsAbi from '@/abi/CoverProducts';
+import { Multicall } from '@/abi/multicall';
+import { Product, ProductType } from '@/model';
+
 import { Fields } from '../processor';
 
 const MULTICALL_ADDRESS = '0xeefba1e63905ef1d7acba5a8513c70307c1ce441';
@@ -32,14 +33,13 @@ export async function handleInitialFetch(
 
   for (let productTypeId = 0; productTypeId < initialProductTypes.length; productTypeId++) {
     const initialProductType = initialProductTypes[productTypeId];
-    const productType = new ProductType();
 
+    const productType = new ProductType();
     productType.id = productTypeId.toString();
     productType.claimMethod = BigInt(initialProductType.claimMethod);
     productType.gracePeriod = BigInt(initialProductType.gracePeriod);
     productType.assessmentCooldownPeriod = BigInt(initialProductType.assessmentCooldownPeriod);
     productType.payoutRedemptionPeriod = BigInt(initialProductType.payoutRedemptionPeriod);
-
     productType.name = productTypeNames[productTypeId].trim();
     productType.metadata = ''; // will be updated in the next few blocks
 
@@ -55,10 +55,17 @@ export async function handleInitialFetch(
     100,
   );
 
+  const allowedPools = await multicall.aggregate(
+    CoverProductsAbi.functions.getAllowedPools,
+    addresses.CoverProducts,
+    initialProducts.map((_, i) => ({ productId: BigInt(i) })),
+    100,
+  );
+
   for (let productId = 0; productId < initialProducts.length; productId++) {
     const initialProduct = initialProducts[productId];
-    const product = new Product();
 
+    const product = new Product();
     product.id = productId.toString();
     product.productType = BigInt(initialProduct.productType);
     product.minPrice = BigInt(initialProduct.minPrice);
@@ -67,10 +74,9 @@ export async function handleInitialFetch(
     product.capacityReductionRatio = BigInt(initialProduct.capacityReductionRatio);
     product.isDeprecated = initialProduct.isDeprecated;
     product.useFixedPrice = initialProduct.useFixedPrice;
-
     product.name = productNames[productId].trim();
     product.metadata = ''; // will be updated in the next few blocks
-    // todo: allowed pools
+    product.allowedPools = allowedPools[productId].map(pool => Number(pool));
 
     products.set(product.id, product);
   }

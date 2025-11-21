@@ -14,10 +14,10 @@
     "db:run": "sqd up",
     "db:migrate": "sqd migration:apply",
     "db:psql": "sqd psql",
-    "dev": "sqd migration:apply && SQD_DEBUG=sqd:processor:mapping nodemon -w src -e ts -x ts-node src/main.ts",
+    "dev:products": "sqd migration:apply && SQD_DEBUG=sqd:processor:mapping nodemon -w src -e ts -x ts-node src/processors/products/index.ts",
     "lint": "eslint --max-warnings 0 .",
     "lint:fix": "eslint --max-warnings 0 . --fix",
-    "start": "sqd migration:apply && node lib/main.js",
+    "start:products": "sqd migration:apply && node lib/processors/products/index.js",
     "typegen": "sqd typegen"
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "eslint-plugin-prettier": "^5.2.1",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^3.15.0",
     "typescript": "^5.5.4"
   }
 }

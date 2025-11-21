@@ -1,25 +1,27 @@
 import { addresses } from '@nexusmutual/deployments';
 import { EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor';
 
-import * as CoverProductsAbi from './abi/CoverProducts';
+import { functions as fn } from '@/abi/CoverProducts';
 
-const { PROVIDER_URL = '' } = process.env;
-const GATEWAY_URL = 'https://v2.archive.subsquid.io/network/ethereum-mainnet';
-const FINALITY_CONFIRMATION = 25; // in blocks = 5 mins to finality
+const {
+  PROVIDER_URL = '',
+  FINALITY_CONFIRMATION = '25', // in blocks = 5 mins to finality
+  GATEWAY_URL = 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
+} = process.env;
 
 export const V3_UPGRADE_BLOCK = 23689684;
 
 const productSettersSighashes = [
-  CoverProductsAbi.functions.setProducts.sighash,
-  CoverProductsAbi.functions.setProductsMetadata.sighash,
-  CoverProductsAbi.functions.setProductTypes.sighash,
-  CoverProductsAbi.functions.setProductTypesMetadata.sighash,
+  fn.setProducts.sighash,
+  fn.setProductsMetadata.sighash,
+  fn.setProductTypes.sighash,
+  fn.setProductTypesMetadata.sighash,
 ];
 
 export const processor = new EvmBatchProcessor()
   .setGateway(GATEWAY_URL)
-  .setRpcEndpoint({ url: PROVIDER_URL, rateLimit: 5 })
-  .setFinalityConfirmation(FINALITY_CONFIRMATION)
+  .setRpcEndpoint({ url: PROVIDER_URL, rateLimit: 20 })
+  .setFinalityConfirmation(Number(FINALITY_CONFIRMATION))
   .addTransaction({
     // targetting v3 upgrade https://etherscan.io/tx/0xb4c6711872002b95e8269431e054a19146cd11b737a76b7408956201e1685169
     // used to fetch the products directly from the contract

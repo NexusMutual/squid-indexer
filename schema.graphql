@@ -19,7 +19,5 @@ type Product @entity {
   isDeprecated: Boolean!
   useFixedPrice: Boolean!
   metadata: String!
-  # todo: allowedPools: BigInt[]!
+  allowedPools: [Int!]!
 }
-
-// TODO: add params entity

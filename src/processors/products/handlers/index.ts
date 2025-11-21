@@ -5,14 +5,15 @@ import { DataHandlerContext } from '@subsquid/evm-processor';
 import { Store } from '@subsquid/typeorm-store';
 import { In } from 'typeorm';
 
-import * as CoverAbi from './abi/Cover';
-import * as CoverProductsAbi from './abi/CoverProducts';
-import { handleInitialFetch } from './handlers/initialFetch';
-import { handleSetProductsMetadata, handleSetProductTypesMetadata } from './handlers/metadata';
-import { handleSetProducts } from './handlers/setProducts';
-import { handleSetProductTypes } from './handlers/setProductTypes';
-import { Product, ProductType } from './model';
-import { Fields, V3_UPGRADE_BLOCK } from './processor';
+import * as CoverAbi from '@/abi/Cover';
+import * as CoverProductsAbi from '@/abi/CoverProducts';
+import { Product, ProductType } from '@/model';
+
+import { Fields, V3_UPGRADE_BLOCK } from '../processor';
+import { handleInitialFetch } from './initialFetch';
+import { handleSetProductsMetadata, handleSetProductTypesMetadata } from './metadata';
+import { handleSetProducts } from './setProducts';
+import { handleSetProductTypes } from './setProductTypes';
 
 const { setProducts, setProductsMetadata, setProductTypes, setProductTypesMetadata } = CoverProductsAbi.functions;
 
@@ -40,7 +41,7 @@ export async function handler(ctx: DataHandlerContext<Store, Fields>) {
     const getDefaultMinPriceRatio = cachingFetcher(async () => BigInt(await cover.DEFAULT_MIN_PRICE_RATIO()));
 
     for (const transaction of block.transactions) {
-      // initial fetch
+      // initial fetch - can be bumped from time to time to a newer block since we don't need historical data
       if (transaction.block.height === V3_UPGRADE_BLOCK) {
         await handleInitialFetch(ctx, block, productTypes, products);
         continue;
@@ -90,9 +91,6 @@ export async function handler(ctx: DataHandlerContext<Store, Fields>) {
   const dbProductTypes = await ctx.store.find(ProductType, { where: { id: In(Array.from(productTypes.keys())) } });
   const dbProductTypeMap = new Map(dbProductTypes.map(productType => [productType.id, productType]));
   productTypes.forEach(pt => productTypes.set(pt.id, { ...dbProductTypeMap.get(pt.id), ...pt }));
-
-  Array.from(products.values()).forEach(product => console.log('product', inspect(product, { depth: null })));
-  Array.from(productTypes.values()).forEach(pt => console.log('productType', inspect(pt, { depth: null })));
 
   await ctx.store.upsert(Array.from(products.values()).map(product => new Product(product)));
   await ctx.store.upsert(Array.from(productTypes.values()).map(productType => new ProductType(productType)));

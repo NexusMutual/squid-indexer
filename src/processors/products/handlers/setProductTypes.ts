@@ -1,5 +1,5 @@
-import * as CoverProductsAbi from '../abi/CoverProducts';
-import { ProductType } from '../model';
+import * as CoverProductsAbi from '@/abi/CoverProducts';
+import { ProductType } from '@/model';
 
 const { setProductTypes } = CoverProductsAbi.functions;
 const MAX_UINT256 = 2n ** 256n - 1n;

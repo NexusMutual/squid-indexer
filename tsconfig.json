@@ -4,6 +4,12 @@
     "target": "es2020",
     "outDir": "lib",
     "rootDir": "src",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "strict": true,
     "declaration": false,
     "sourceMap": true,
@@ -12,6 +18,11 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "resolveJsonModule": true
+  },
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
   },
   "include": [
     "src"
