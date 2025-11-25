@@ -1,0 +1,10 @@
+{
+  "name": "@nexusmutual/typescript-config",
+  "version": "0.0.1",
+  "files": [
+    "*.json"
+  ],
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.5"
+  }
+}

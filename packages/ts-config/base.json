@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "${configDir}/dist",
+    "rootDir": "${configDir}/src",
+    "tsBuildInfoFile": "${configDir}/dist/tsconfig.tsbuildinfo",
+
+    "strict": true,
+    "skipLibCheck": true,
+    "moduleDetection": "force",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "isolatedModules": true,
+    "noEmitOnError": true,
+    "noImplicitOverride": true
+  }
+}

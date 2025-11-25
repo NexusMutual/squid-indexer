@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "tagPrefix": "${packageName}@",
+  "versionStrategy": "commitMessage",
+  "preset": "angular",
+  "prereleaseIdentifier": "beta",
+  "baseBranch": "master",
+  "updateInternalDependencies": "patch",
+  "sync": false,
+  "commitMessage": "chore: release ${packageName}@${version} [skip-ci]"
+}

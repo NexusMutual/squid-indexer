@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "noUpdateNotifier": true,
+  "remoteCache": { "enabled": false },
+  "globalEnv": ["DEBUG"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false
+    },
+    "dev": {
+      "dependsOn": ["@nexusmutual/db-schema#db:wait"],
+      "with": ["@nexusmutual/db-schema#db:up", "indexers#dev:products"],
+      "persistent": true,
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    },
+    "indexers#dev:products": {
+      "cache": false,
+      "persistent": true
+    },
+    "@nexusmutual/db-schema#db:up": {
+      "cache": false,
+      "persistent": true
+    },
+    "@nexusmutual/db-schema#migration:apply": {
+      "cache": false
+    },
+    "@nexusmutual/db-schema#db:wait": {
+      "cache": false
+    }
+  },
+  "ui": "tui"
+}

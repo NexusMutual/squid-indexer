@@ -1,0 +1,55 @@
+name: pull-request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  checks:
+    # Skip CI for draft PRs since this workflow is triggered once its review for review
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build all packages
+        run: npm run build
+
+  build-api-image:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build API Docker image
+        run: docker build -f packages/api/Dockerfile .
+
+  build-processors-image:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build processors Docker image
+        run: docker build -f packages/processors/Dockerfile .

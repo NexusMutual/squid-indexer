@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: packages/api/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - postgres
+
+  # products-indexer:
+  #   build:
+  #     context: .
+  #     dockerfile: packages/indexers/Dockerfile
+  #   command: [ "npm", "run", "start:products" ]
+  #   environment:
+  #     - NODE_ENV=production
+  #   depends_on:
+  #     - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: "${DB_NAME-postgres}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD-postgres}"
+    ports:
+      # development only!
+      - "${DB_PORT-5432}:5432"

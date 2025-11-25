@@ -1,0 +1,57 @@
+{
+  "$schema": "https://cdn.subsquid.io/schemas/commands.json",
+  "commands": {
+    "clean": {
+      "description": "delete all build artifacts",
+      "cmd": ["npx", "--yes", "rimraf", "dist"]
+    },
+    "build": {
+      "description": "Build the squid project",
+      "deps": ["clean"],
+      "cmd": ["tsc"]
+    },
+    "up": {
+      "description": "Start a PG database",
+      "cmd": ["docker", "compose", "up", "--force-recreate", "--renew-anon-volumes"]
+    },
+    "psql": {
+      "description": "Start a psql shell",
+      "cmd": ["docker", "exec", "-it", "services-db-1", "psql", "-U", "postgres", "services"]
+    },
+    "migration:apply": {
+      "description": "Apply the DB migrations",
+      "cmd": ["squid-typeorm-migration", "apply"]
+    },
+    "migration:generate": {
+      "description": "Generate a DB migration matching the TypeORM entities",
+      "deps": ["build", "migration:clean"],
+      "cmd": ["squid-typeorm-migration", "generate"]
+    },
+    "migration:clean": {
+      "description": "Clean the migrations folder",
+      "cmd": ["npx", "--yes", "rimraf", "./db/migrations"]
+    },
+    "migration": {
+      "deps": ["build"],
+      "cmd": ["squid-typeorm-migration", "generate"],
+      "hidden": true
+    },
+    "codegen": {
+      "description": "Generate TypeORM entities from the schema file",
+      "cmd": ["squid-typeorm-codegen"]
+    },
+    "typegen": {
+      "description": "Generate data access classes for an ABI file(s) in the ./abi folder",
+      "cmd": ["squid-evm-typegen", "./src/abi", { "glob": "./abi/*.json" }, "--multicall"]
+    },
+    "check-updates": {
+      "cmd": ["npx", "--yes", "npm-check-updates", "--filter=/subsquid/", "--upgrade"],
+      "hidden": true
+    },
+    "bump": {
+      "description": "Bump @subsquid packages to the latest versions",
+      "deps": ["check-updates"],
+      "cmd": ["npm", "i", "-f"]
+    }
+  }
+}

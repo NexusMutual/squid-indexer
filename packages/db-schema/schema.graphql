@@ -1,0 +1,37 @@
+type ProductType @entity {
+  id: ID!
+  name: String!
+  claimMethod: BigInt!
+  gracePeriod: BigInt!
+  assessmentCooldownPeriod: BigInt!
+  payoutRedemptionPeriod: BigInt!
+  metadata: String!
+}
+
+type Product @entity {
+  id: ID!
+  productType: BigInt!
+  name: String!
+  minPrice: BigInt!
+  coverAssets: BigInt!
+  initialPriceRatio: BigInt!
+  capacityReductionRatio: BigInt!
+  isDeprecated: Boolean!
+  useFixedPrice: Boolean!
+  metadata: String
+  allowedPools: [Int!]!
+}
+
+enum Kind {
+  product
+  product_type
+  generic
+}
+
+type Attribute @entity {
+  id: ID!
+  kind: Kind!
+  targetId: String!
+  key: String!
+  value: String!
+}

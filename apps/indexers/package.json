@@ -1,0 +1,29 @@
+{
+  "name": "indexers",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist/",
+    "dev:products": "SQD_DEBUG=sqd:processor:mapping nodemon -w src -w ../db-schema/dist -e ts -x ts-node src/products/index.ts",
+    "start:products": "node dist/products/index.js"
+  },
+  "dependencies": {
+    "@nexusmutual/db-schema": "workspace:*",
+    "@nexusmutual/deployments": "^3.1.0",
+    "@subsquid/evm-processor": "^1.27.3",
+    "@subsquid/typeorm-store": "^1.5.1",
+    "convict": "^6.2.4",
+    "convict-format-with-validator": "^6.2.0",
+    "dotenv": "^17.2.3",
+    "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "@nexusmutual/typescript-config": "workspace:*",
+    "@types/convict": "^6.1.6",
+    "@types/convict-format-with-validator": "^6.0.6",
+    "nodemon": "^3.1.0",
+    "typescript": "^5.9.3"
+  }
+}

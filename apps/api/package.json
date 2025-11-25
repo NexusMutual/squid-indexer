@@ -1,0 +1,56 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "imports": {
+    "#*": "./src/*"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "typesVersions": {
+    "*": {
+      "db": [
+        "dist/db.d.ts"
+      ],
+      "router": [
+        "dist/router.d.ts"
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rm -rf dist/",
+    "dev": "nodemon -w src -w ../db-schema/dist -e ts -x tsx src/index.ts",
+    "start": "node dist/index.js",
+    "test": "mocha --import tsx test/**/*.ts"
+  },
+  "dependencies": {
+    "@needle-di/core": "^1.1.0",
+    "@nexusmutual/db-schema": "workspace:*",
+    "convict": "^6.2.4",
+    "convict-format-with-validator": "^6.2.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "@nexusmutual/typescript-config": "workspace:*",
+    "@types/chai": "^5.2.3",
+    "@types/convict": "^6.1.6",
+    "@types/convict-format-with-validator": "^6.0.6",
+    "@types/express": "^5.0.6",
+    "@types/mocha": "^10.0.10",
+    "@types/sinon": "^21.0.0",
+    "chai": "^6.2.1",
+    "mocha": "^11.7.5",
+    "nodemon": "^3.1.11",
+    "sinon": "^21.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

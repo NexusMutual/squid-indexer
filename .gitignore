@@ -1,7 +1,5 @@
-/.env
-/.idea
-/.vscode
-/**Versions.json
-/builds
-/lib
 /node_modules
+.env
+.idea
+.turbo
+.vscode
