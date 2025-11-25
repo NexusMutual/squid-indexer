@@ -48,6 +48,7 @@ module.exports = {
         ...jsRules,
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': 'error',
+        '@typescript-eslint/no-unused-expressions': ['error', { allowChaiExpect: true }],
         'n/no-missing-import': 'off',
         'import/no-unresolved': 'error',
       },

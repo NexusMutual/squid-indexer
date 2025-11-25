@@ -2,12 +2,7 @@ import { addresses } from '@nexusmutual/deployments';
 import { EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor';
 
 import { functions as fn } from '@/abi/CoverProducts';
-
-const {
-  PROVIDER_URL = '',
-  FINALITY_CONFIRMATION = '25', // in blocks = 5 mins to finality
-  GATEWAY_URL = 'https://v2.archive.subsquid.io/network/ethereum-mainnet',
-} = process.env;
+import config from '@/config';
 
 export const V3_UPGRADE_BLOCK = 23689684;
 
@@ -19,9 +14,9 @@ const productSettersSighashes = [
 ];
 
 export const processor = new EvmBatchProcessor()
-  .setGateway(GATEWAY_URL)
-  .setRpcEndpoint({ url: PROVIDER_URL, rateLimit: 20 })
-  .setFinalityConfirmation(Number(FINALITY_CONFIRMATION))
+  .setGateway(config.get('gateway_url'))
+  .setRpcEndpoint({ url: config.get('provider_url')!, rateLimit: 20 })
+  .setFinalityConfirmation(Number(config.get('finality_confirmation')))
   .addTransaction({
     // targetting v3 upgrade https://etherscan.io/tx/0xb4c6711872002b95e8269431e054a19146cd11b737a76b7408956201e1685169
     // used to fetch the products directly from the contract

@@ -3,7 +3,6 @@
     "module": "commonjs",
     "target": "es2020",
     "outDir": "lib",
-    "rootDir": "src",
     "baseUrl": "./",
     "paths": {
       "@/*": [
@@ -25,7 +24,8 @@
     ]
   },
   "include": [
-    "src"
+    "src",
+    "test"
   ],
   "exclude": [
     "node_modules"

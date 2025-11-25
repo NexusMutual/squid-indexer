@@ -1,5 +1,4 @@
 import 'dotenv/config';
-
 import { TypeormDatabase } from '@subsquid/typeorm-store';
 
 import { handler } from './handlers';
