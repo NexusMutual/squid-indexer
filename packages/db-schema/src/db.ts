@@ -1,4 +1,4 @@
-import { BaseEntity, DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from '@subsquid/typeorm-config/lib/namingStrategy';
 import path from 'path';
 
@@ -21,7 +21,6 @@ export const createDataSource = async (options: DataSourceOptions): Promise<Data
   });
 
   await dataSource.initialize();
-  BaseEntity.useDataSource(dataSource);
 
   return dataSource;
 };
