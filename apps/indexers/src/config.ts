@@ -23,6 +23,12 @@ const config = convict({
     default: 25,
     env: 'FINALITY_CONFIRMATION',
   },
+  vnet_fork_block: {
+    doc: 'VNET fork block, to stop using squid gateway and start using RPC for blocks after this block.',
+    format: 'nat',
+    default: Math.pow(2, 32), // far away in the future
+    env: 'VNET_FORK_BLOCK',
+  },
   db_host: {
     doc: 'Database host',
     format: String,
