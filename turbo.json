@@ -34,7 +34,8 @@
     },
     "@nexusmutual/db-schema#db:wait": {
       "cache": false
-    }
-  },
-  "ui": "tui"
+    },
+    "//#lint": {},
+    "//#lint:fix": {}
+  }
 }
