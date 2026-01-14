@@ -1,0 +1,74 @@
+name: Tag Push
+
+on:
+  push:
+    tags:
+      - '*@*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build-image:
+    runs-on: ubuntu-22.04
+    environment: production
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.ref_name }}
+
+      - name: Prepare build metadata
+        id: meta
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          APP="${TAG%%@*}"
+
+          if [[ ! "$APP" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "::error::Invalid app name: $APP"
+            exit 1
+          fi
+
+          VERSION=$(jq -r .version "apps/${APP}/package.json")
+
+          if [[ "${APP}@${VERSION}" != "$TAG" ]]; then
+            echo "::error::Tag mismatch: ${APP}@${VERSION} != ${TAG}"
+            exit 1
+          fi
+
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          REVISION="${VERSION}-${SHA_SHORT}"
+          IMAGE=$(echo "ghcr.io/nexusmutual/${APP}" | tr '[:upper:]' '[:lower:]')
+          TAGS="${IMAGE}:${REVISION},${IMAGE}:staging"
+
+          echo "APP=${APP}"
+          echo "VERSION=${VERSION}"
+          echo "REVISION=${REVISION}"
+          echo "IMAGE=${IMAGE}"
+          echo "TAGS=${TAGS}"
+
+          echo "app=${APP}" >> $GITHUB_OUTPUT
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # note: I expect this step to fail if the image exists (untested)
+      #       but it's probably fine as is for now
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/${{ steps.meta.outputs.app }}/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
+          push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
