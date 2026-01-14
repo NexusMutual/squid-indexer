@@ -29,6 +29,7 @@ jobs:
         id: meta
         env:
           TAG: ${{ github.ref_name }}
+        # TODO: only add staging on dev
         run: |
           APP="${TAG%%@*}"
 

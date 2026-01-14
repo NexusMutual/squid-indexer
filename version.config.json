@@ -3,7 +3,7 @@
   "tagPrefix": "${packageName}@",
   "versionStrategy": "commitMessage",
   "preset": "angular",
-  "prereleaseIdentifier": "rc",
+  "prereleaseIdentifier": "hotfix",
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
   "sync": false,

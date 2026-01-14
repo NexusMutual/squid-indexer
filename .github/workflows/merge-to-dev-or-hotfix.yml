@@ -43,7 +43,7 @@ jobs:
 
       - name: Bump versions
         env:
-          args: ${{ github.ref_name == 'dev' && '--prerelease' || '' }}
+          args: ${{ github.ref_name == 'dev' && '' || '--prerelease' }}
         run: pnpm turboversion ${{ env.args }}
 
       - name: Push changes and tags
