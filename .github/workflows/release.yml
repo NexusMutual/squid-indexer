@@ -8,89 +8,111 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-tag-version-equality:
-    uses: NexusMutual/workflows/.github/workflows/check-tag-version-equality.yml@master
-    with:
-      environment: production
-      ref: release-candidate
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+  checks:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Verify branch
+        if: github.ref_name != 'dev' && github.ref_name != 'hotfix'
+        run: |
+          echo "::error::This workflow can only be run from dev or hotfix branches"
+          exit 1
 
-  check-workflow-status:
-    uses: NexusMutual/workflows/.github/workflows/check-workflow-status.yml@master
-    with:
-      workflow-name: merge-to-dev-or-hotfix.yml
-      workflow-status: in_progress
-      fail-if-exists: true
+      - name: Check workflow status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              status: 'in_progress',
+            });
 
-  ff-master:
-    needs: [check-tag-version-equality, check-workflow-status]
-    uses: NexusMutual/workflows/.github/workflows/fast-forward.yml@master
-    with:
-      environment: production
-      source-ref: release-candidate
-      target-ref: master
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+            // "release.yml" is checked using the concurrency group at the top of this file
+            const workflows = [
+              '.github/workflows/merge-to-dev-or-hotfix.yml',
+              '.github/workflows/tag-push.yml',
+            ];
 
-  tag-api-image:
-    needs: ff-master
-    uses: NexusMutual/workflows/.github/workflows/tag-image.yml@master
-    with:
-      environment: production
-      image: ${{ github.repository }}-api
-      ref: master
-      target-tag: latest
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+            const running = data.workflow_runs
+              .filter(run => workflows.some(w => run.path.startsWith(w)));
 
-  tag-processors-image:
-    needs: ff-master
-    uses: NexusMutual/workflows/.github/workflows/tag-image.yml@master
-    with:
-      environment: production
-      image: ${{ github.repository }}-processors
-      ref: master
-      target-tag: latest
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+            if (running.length > 0) {
+              core.setFailed(`Workflows currently running: ${running.join(', ')}. Please retry after they complete.`);
+            }
 
-  git-tag-release:
-    needs: ff-master
-    uses: NexusMutual/workflows/.github/workflows/git-tag-github-release.yml@master
-    with:
-      environment: production
-      ref: master
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+  release:
+    needs: checks
+    runs-on: ubuntu-22.04
+    environment: production
+    steps:
+      - name: Create deployer app token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.DEPLOYER_APP_ID }}
+          private-key: ${{ secrets.DEPLOYER_APP_PK }}
 
-  # NOTE: the push that happens in the rebase.yml will trigger merge-to-dev-or-hotfix workflow
-  rebase-hotfix:
-    needs: ff-master
-    uses: NexusMutual/workflows/.github/workflows/rebase.yml@master
-    with:
-      environment: production
-      source-ref: master
-      target-ref: hotfix
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          ref: master
+          fetch-depth: 0
 
-  # NOTE: the push that happens in the rebase.yml will trigger merge-to-dev-or-hotfix workflow
-  rebase-dev:
-    needs: ff-master
-    uses: NexusMutual/workflows/.github/workflows/rebase.yml@master
-    with:
-      environment: production
-      source-ref: master
-      target-ref: dev
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+      - name: Find tags to release
+        id: find-tags
+        run: |
+          git fetch origin ${{ github.ref_name }} --tags
+
+          # Tags on source but not master, sorted descending; first per app is latest
+          RELEASE_TAGS=$(git tag --merged origin/${{ github.ref_name }} --no-merged master --sort=-version:refname \
+            | grep '@' \
+            | awk -F'@' '!seen[$1]++')
+
+          # Build release data (line-based: APP TAG VERSION IMAGE_TAG)
+          RELEASES=""
+          for TAG in $RELEASE_TAGS; do
+            APP="${TAG%%@*}"
+            VERSION="${TAG#*@}"
+            SHA=$(git rev-parse --short "${TAG}^{commit}")
+            RELEASES+="${APP} ${TAG} ${VERSION} ${VERSION}-${SHA}"$'\n'
+          done
+          echo "releases<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "Found releases:"
+          echo "$RELEASES"
+
+      - name: Fast-forward to master
+        run: git merge origin/${{ github.ref_name }} --ff-only
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Tag Docker images as latest
+        run: |
+          while read APP TAG VERSION IMAGE_TAG; do
+            [[ -z "$APP" ]] && continue
+            IMAGE=$(echo "ghcr.io/nexusmutual/${APP}" | tr '[:upper:]' '[:lower:]')
+            docker pull "${IMAGE}:${IMAGE_TAG}"
+            docker tag "${IMAGE}:${IMAGE_TAG}" "${IMAGE}:latest"
+            docker push "${IMAGE}:latest"
+          done <<< "${{ steps.find-tags.outputs.releases }}"
+
+      - name: Create GitHub releases
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          while read APP TAG VERSION IMAGE_TAG; do
+            [[ -z "$APP" ]] && continue
+            if ! gh release view "$TAG" >/dev/null 2>&1; then
+              gh release create "$TAG" --title "${APP} v${VERSION}" --generate-notes --target master
+            fi
+          done <<< "${{ steps.find-tags.outputs.releases }}"
+
+      - name: Push master to origin
+        run: git push origin master
