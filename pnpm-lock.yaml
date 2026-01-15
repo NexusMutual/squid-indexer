@@ -167,6 +167,70 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  apps/rwivaultapi:
+    dependencies:
+      '@needle-di/core':
+        specifier: ^1.1.0
+        version: 1.1.0
+      '@nexusmutual/db-schema':
+        specifier: workspace:*
+        version: link:../../packages/db-schema
+      convict:
+        specifier: ^6.2.4
+        version: 6.2.4
+      convict-format-with-validator:
+        specifier: ^6.2.0
+        version: 6.2.0
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      express:
+        specifier: ^5.2.1
+        version: 5.2.1
+      typeorm:
+        specifier: ^0.3.28
+        version: 0.3.28(pg@8.16.3)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3))
+    devDependencies:
+      '@nexusmutual/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/ts-config
+      '@types/chai':
+        specifier: ^5.2.3
+        version: 5.2.3
+      '@types/convict':
+        specifier: ^6.1.6
+        version: 6.1.6
+      '@types/convict-format-with-validator':
+        specifier: ^6.0.6
+        version: 6.0.6
+      '@types/express':
+        specifier: ^5.0.6
+        version: 5.0.6
+      '@types/mocha':
+        specifier: ^10.0.10
+        version: 10.0.10
+      '@types/sinon':
+        specifier: ^21.0.0
+        version: 21.0.0
+      chai:
+        specifier: ^6.2.1
+        version: 6.2.1
+      mocha:
+        specifier: ^11.7.5
+        version: 11.7.5
+      nodemon:
+        specifier: ^3.1.11
+        version: 3.1.11
+      sinon:
+        specifier: ^21.0.0
+        version: 21.0.0
+      tsx:
+        specifier: ^4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/db-schema:
     dependencies:
       '@subsquid/evm-abi':
@@ -189,7 +253,7 @@ importers:
         version: 1.5.1(@subsquid/big-decimal@1.0.0)(typeorm@0.3.28(pg@8.16.3)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3)))
       debug:
         specifier: ^4.4.3
-        version: 4.4.3(supports-color@8.1.1)
+        version: 4.4.3(supports-color@5.5.0)
       typeorm:
         specifier: ^0.3.28
         version: 0.3.28(pg@8.16.3)(ts-node@10.9.2(@types/node@24.10.1)(typescript@5.9.3))

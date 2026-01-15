@@ -2,8 +2,9 @@ services:
   db:
     image: postgres:15
     environment:
-      POSTGRES_DB: "${DB_NAME-postgres}"
-      POSTGRES_PASSWORD: "${DB_PASSWORD-postgres}"
+      POSTGRES_DB: '${DB_NAME:-indexer}'
+      POSTGRES_USER: '${DB_USER:-postgres}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD:-postgres}'
     ports:
       # development only!
-      - "${DB_PORT-5432}:5432"
+      - '${DB_PORT:-5432}:5432'

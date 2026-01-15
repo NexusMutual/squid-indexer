@@ -9,7 +9,7 @@
     "clean": "rm -rf dist/",
     "codegen": "squid-typeorm-codegen",
     "copy-abis": "ts-node src/scripts/copy-abis.ts",
-    "db:psql": "docker exec -it services-db-1 psql -U postgres services",
+    "db:psql": "docker exec -it db-schema-db-1 psql -U postgres -d indexer",
     "db:up": "docker compose up --force-recreate --renew-anon-volumes",
     "db:wait": "ts-node src/scripts/wait-for-db.ts",
     "dev": "tsc --build --watch",

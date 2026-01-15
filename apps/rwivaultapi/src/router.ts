@@ -7,20 +7,16 @@ export const createRouter = (container: Container): Router => {
   const router = Router();
   const service = container.get(ServiceToken);
 
-  router.get('/products', async (_req, res) => {
-    const products = await service.getProducts();
-    res.json(products);
-  });
-
-  router.get('/product-types', async (_req, res) => {
-    const productTypes = await service.getProductTypes();
-    res.json(productTypes);
-  });
-
   router.get('/rwi-vault/member-transactions/:memberId', async (req, res) => {
     const memberId = req.params.memberId;
     const memberTransactions = await service.getMemberTransactions(memberId);
     res.json(memberTransactions);
+  });
+
+  router.get('/rwi-vault/member-locks/:memberId', async (req, res) => {
+    const memberId = req.params.memberId;
+    const memberLocks = await service.getMemberLocks(memberId);
+    res.json(memberLocks);
   });
 
   return router;

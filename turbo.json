@@ -14,7 +14,7 @@
     },
     "dev": {
       "dependsOn": ["@nexusmutual/db-schema#db:wait"],
-      "with": ["@nexusmutual/db-schema#db:up", "indexers#dev:products"],
+      "with": ["@nexusmutual/db-schema#db:up", "indexers#dev:rwivault"],
       "persistent": true,
       "cache": false
     },
@@ -22,6 +22,10 @@
       "cache": false
     },
     "indexers#dev:products": {
+      "cache": false,
+      "persistent": true
+    },
+    "indexers#dev:rwivault": {
       "cache": false,
       "persistent": true
     },

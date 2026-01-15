@@ -1,34 +1,15 @@
 import {
-  Product,
-  ProductType,
   DepositRequest,
   DepositFulfilled,
   DepositCanceled,
   RedeemRequest,
   RedeemRequestCanceled,
   RedeemFulfilled,
+  MemberLocks,
 } from '@nexusmutual/db-schema/model';
 import { DataSource } from 'typeorm';
 
 export const createService = (dataSource: DataSource) => {
-  const getProducts = async () => {
-    const products = await dataSource
-      .getRepository(Product)
-      .createQueryBuilder('product')
-      .orderBy('CAST(product.id AS INTEGER)', 'ASC')
-      .getMany();
-    return products;
-  };
-
-  const getProductTypes = async () => {
-    const productTypes = await dataSource
-      .getRepository(ProductType)
-      .createQueryBuilder('productType')
-      .orderBy('CAST(productType.id AS INTEGER)', 'ASC')
-      .getMany();
-    return productTypes;
-  };
-
   const getMemberTransactions = async (memberId: string) => {
     const depositRequests = await dataSource
       .getRepository(DepositRequest)
@@ -76,7 +57,33 @@ export const createService = (dataSource: DataSource) => {
     };
   };
 
-  return { getProducts, getProductTypes, getMemberTransactions };
+  const getMemberLocks = async (memberId: string) => {
+    const memberLocks = await dataSource
+      .getRepository(MemberLocks)
+      .createQueryBuilder('memberLocks')
+      .where('memberLocks.memberId = :memberId', { memberId })
+      .getMany();
+
+    const locksWithPoints = memberLocks.map(lock => {
+      const day = 24 * 60 * 60;
+      const shareUnit = 10n ** 8n;
+      const shareMultiplier = lock.shares / (shareUnit * 1000n);
+      const earningRate = (Number(lock.period) / (day * 90)) * Number(shareMultiplier);
+      const cappedEarningRate = Math.max(1, Math.min(earningRate, 8));
+      const now = Math.floor(Date.now() / 1000);
+      const start = Math.floor(lock.startTime.getTime() / 1000);
+      const points = cappedEarningRate * (now - start);
+
+      return {
+        ...lock,
+        points,
+      };
+    });
+
+    return locksWithPoints;
+  };
+
+  return { getMemberTransactions, getMemberLocks };
 };
 
 export type Service = ReturnType<typeof createService>;

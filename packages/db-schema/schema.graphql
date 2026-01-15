@@ -35,3 +35,74 @@ type Attribute @entity {
   key: String!
   value: String!
 }
+
+type DepositRequest @entity {
+  id: ID!
+  sender: String!
+  memberId: BigInt! @index
+  assets: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type DepositCanceled @entity {
+  id: ID!
+  sender: String!
+  memberId: BigInt! @index
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type DepositFulfilled @entity {
+  id: ID!
+  memberAddress: String!
+  memberId: BigInt! @index
+  assets: BigInt!
+  shares: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type RedeemRequest @entity {
+  id: ID!
+  sender: String!
+  memberId: BigInt! @index
+  shares: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type RedeemRequestCanceled @entity {
+  id: ID!
+  sender: String!
+  memberId: BigInt! @index
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type RedeemFulfilled @entity {
+  id: ID!
+  requestId: BigInt! @index
+  memberAddress: String!
+  memberId: BigInt! @index
+  assets: BigInt!
+  shares: BigInt!
+  timestamp: DateTime!
+  blockNumber: Int!
+  txHash: String!
+}
+
+type MemberLocks @entity {
+  id: ID!
+  memberId: BigInt! @index
+  lockId: BigInt!
+  shares: BigInt!
+  startTime: DateTime!
+  period: BigInt!
+  withdrawnAt: DateTime
+}

@@ -1,8 +1,8 @@
 import { functions as fn } from '@nexusmutual/db-schema/abi/CoverProducts';
 import { addresses } from '@nexusmutual/deployments';
-import { EvmBatchProcessorFields } from '@subsquid/evm-processor';
+import { EvmBatchProcessor, EvmBatchProcessorFields } from '@subsquid/evm-processor';
 
-import { createVnetAwareProcessor } from '../processor';
+import config from '../config';
 
 export const V3_UPGRADE_BLOCK = 23689684;
 
@@ -13,9 +13,10 @@ const productSettersSighashes = [
   fn.setProductTypesMetadata.sighash,
 ];
 
-export const processor = await createVnetAwareProcessor();
-
-processor
+export const processor = new EvmBatchProcessor()
+  .setGateway(config.get('gateway_url'))
+  .setRpcEndpoint({ url: config.get('provider_url')!, rateLimit: 20 })
+  .setFinalityConfirmation(Number(config.get('finality_confirmation')))
   .addTransaction({
     // targetting v3 upgrade https://etherscan.io/tx/0xb4c6711872002b95e8269431e054a19146cd11b737a76b7408956201e1685169
     // used to fetch the products directly from the contract

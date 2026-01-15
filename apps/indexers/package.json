@@ -7,7 +7,9 @@
     "build": "tsc --build",
     "clean": "rm -rf dist/",
     "dev:products": "SQD_DEBUG=sqd:processor:mapping nodemon -w src -w ../db-schema/dist -e ts -x ts-node src/products/index.ts",
-    "start:products": "node dist/products/index.js"
+    "dev:rwivault": "SQD_DEBUG=sqd:processor:mapping nodemon -w src -w ../db-schema/dist -e ts -x ts-node src/rwivault/index.ts",
+    "start:products": "node dist/products/index.js",
+    "start:rwivault": "node dist/rwivault/index.js"
   },
   "dependencies": {
     "@nexusmutual/db-schema": "workspace:*",
