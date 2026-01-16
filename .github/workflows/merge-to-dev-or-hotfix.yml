@@ -10,71 +10,46 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: '22'
+
 jobs:
-  # Outputs bump_type and triggers_bump
-  check-version-bump:
-    uses: NexusMutual/workflows/.github/workflows/check-version-bump.yml@master
-    with:
-      ref: ${{ github.ref_name }}
-      environment: production
-      bump-command: npx conventional-recommended-bump --config .github/config/conventional-bump-setup.js
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+  create-rc:
+    runs-on: ubuntu-22.04
+    environment: production
+    steps:
+      - name: Create deployooor app token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.DEPLOYER_APP_ID }}
+          private-key: ${{ secrets.DEPLOYER_APP_PK }}
 
-  reset-release-candidate:
-    needs: check-version-bump
-    if: needs.check-version-bump.outputs.triggers_bump == 'true'
-    uses: NexusMutual/workflows/.github/workflows/reset.yml@master
-    with:
-      target-ref: release-candidate
-      base-ref: ${{ github.ref_name }}
-      environment: production
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          fetch-depth: 0
 
-  bump-version:
-    needs: [check-version-bump, reset-release-candidate]
-    uses: NexusMutual/workflows/.github/workflows/bump.yml@master
-    with:
-      ref: 'release-candidate'
-      bump-command: |
-        echo 'Executing npm version bump: ${{ needs.check-version-bump.outputs.bump_type }}'
-        npm version "${{ needs.check-version-bump.outputs.bump_type }}" --no-git-tag-version
-      environment: production
-    secrets:
-      DEPLOYER_APP_ID: ${{ secrets.DEPLOYER_APP_ID }}
-      DEPLOYER_APP_PK: ${{ secrets.DEPLOYER_APP_PK }}
+      # setup pnpm first
+      - uses: pnpm/action-setup@v4
 
-  build-image:
-    needs: bump-version
-    strategy:
-      matrix:
-        package: [api, processors]
-    uses: NexusMutual/workflows/.github/workflows/build-image.yml@master
-    with:
-      ref: 'release-candidate'
-      environment: production
-      image: ${{ github.repository }}-${{ matrix.package }}
-      dockerfile: packages/${{ matrix.package }}/Dockerfile
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
 
-  tag-image:
-    needs: build-image
-    strategy:
-      matrix:
-        package: [api, processors]
-    uses: NexusMutual/workflows/.github/workflows/tag-image.yml@master
-    with:
-      environment: production
-      image: ${{ github.repository }}-${{ matrix.package }}
-      ref: 'release-candidate'
-      target-tag: staging
-    secrets:
-      TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure git
+        run: |
+          git config --local user.email "deployooor@nexusmutual.io"
+          git config --local user.name "Version bumpooor"
+
+      - name: Bump versions
+        env:
+          args: ${{ github.ref_name == 'dev' && '' || '--prerelease' }}
+        run: pnpm turboversion ${{ env.args }}
+
+      - name: Push changes and tags
+        run: git push origin ${{ github.ref_name }} --follow-tags

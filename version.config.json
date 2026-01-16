@@ -3,9 +3,9 @@
   "tagPrefix": "${packageName}@",
   "versionStrategy": "commitMessage",
   "preset": "angular",
-  "prereleaseIdentifier": "beta",
+  "prereleaseIdentifier": "hotfix",
   "baseBranch": "master",
   "updateInternalDependencies": "patch",
   "sync": false,
-  "commitMessage": "chore: release ${packageName}@${version} [skip-ci]"
+  "commitMessage": "chore: release ${packageName}@${version}"
 }

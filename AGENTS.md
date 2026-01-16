@@ -10,7 +10,7 @@ This is a monorepo for NexusMutual backend services monorepo.
 
 ## Setup & Tools
 - **Package Manager**: `pnpm` (v10.17.1+).
-- **Build Tool**: `turbo` repo.
+- **Build Tool**: `turbo`.
 - **Database**: PostgreSQL (managed using `typeorm` via `packages/db-schema`).
 
 ## Instructions

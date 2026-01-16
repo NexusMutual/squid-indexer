@@ -11,45 +11,93 @@ env:
   NODE_VERSION: '22'
 
 jobs:
-  checks:
-    # Skip CI for draft PRs since this workflow is triggered once its review for review
+  lint:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # setup pnpm first
+      - uses: pnpm/action-setup@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: "npm"
-          cache-dependency-path: package-lock.json
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts --prefer-offline --no-audit --no-fund
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: pnpm run lint
 
-      - name: Build all packages
-        run: npm run build
-
-  build-api-image:
+  build:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Build API Docker image
-        run: docker build -f packages/api/Dockerfile .
+      - uses: pnpm/action-setup@v4
 
-  build-processors-image:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.head_ref || github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.base_ref }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Build
+        run: pnpm run build
+
+  test:
     if: github.event.pull_request.draft == false
+    needs: build
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    strategy:
+      matrix:
+        package: [api, indexers]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Build processors Docker image
-        run: docker build -f packages/processors/Dockerfile .
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-${{ github.head_ref || github.ref_name }}-
+            ${{ runner.os }}-turbo-${{ github.base_ref }}-
+            ${{ runner.os }}-turbo-
+
+      - name: Test
+        run: pnpm turbo run test --filter=${{ matrix.package }}
